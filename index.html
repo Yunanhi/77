@@ -361,7 +361,7 @@
                         </div>
                         <div>
                             <h2 class="text-2xl font-bold text-sbk-darkText">SBK 품질 관리 표준 양식</h2>
-                            <p class="text-xs text-sbk-lightText">첨부된 5대 품질 양식 서식을 클릭하여 확인하고 다운로드받으실 수 있습니다.</p>
+                            <p class="text-xs text-sbk-lightText">첨부된 5대 품질 양식 서식을 클릭하여 확인하고 직접 다운로드받으실 수 있습니다.</p>
                         </div>
                     </div>
                 </div>
@@ -425,12 +425,12 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    <!-- Video Player Column -->
+                    <!-- Video Player Column (video.mp4 파일 직접 연결) -->
                     <div class="lg:col-span-8 bg-black rounded-3xl overflow-hidden shadow-2xl relative">
-                        <video id="pcr-overview-video" controls class="w-full h-auto aspect-video rounded-3xl" poster="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1200&q=80">
-                            <!-- Embedded Video Source with fallback -->
-                            <source src="4분영상 파일.mp4" type="video/mp4">
-                            <p class="text-white p-4 text-center">사용 중인 브라우저가 비디오 재생을 지원하지 않습니다.</p>
+                        <video id="pcr-overview-video" controls playsinline preload="metadata" class="w-full h-auto aspect-video rounded-3xl" poster="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1200&q=80">
+                            <!-- 상대 경로 video.mp4 연결 -->
+                            <source src="video.mp4" type="video/mp4">
+                            <p class="text-white p-4 text-center">사용 중인 브라우저가 비디오 재생을 지원하지 않습니다. 폴더 내 video.mp4 파일을 확인하세요.</p>
                         </video>
                     </div>
 
@@ -517,7 +517,7 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        // Data Structures for SOPs and Forms
+        // Data Structures for SOPs
         const sopData = [
             {
                 id: 'doc',
@@ -603,15 +603,16 @@
             }
         ];
 
+        // Data Structures for Forms (실제 파일 연결)
         const formsData = [
-            { id: 'f1', title: 'PCR 진단키트 문서관리 양식', code: 'QF-DOC-001/002/003', file: '문서관리양식.pdf' },
-            { id: 'f2', title: '위험관리 양식 (Plan/Report/FMEA)', code: 'QF-RA-701-01/02/03', file: '위험관리_통합.pdf' },
-            { id: 'f3', title: '시험 및 검사 양식 (입고/공정/완제품)', code: 'QC-F-01~03_통합', file: '시험 및 검사 -01~03_통합.pdf' },
-            { id: 'f4', title: '식별 및 추적관리 양식', code: 'QC-F-01/02/03_추적', file: '식별_추적관리_양식_통합.pdf' },
-            { id: 'f5', title: 'CAPA 시정 및 예방조치 양식', code: 'QF-CAPA-001/003', file: 'CAPA_양식_통합.pdf' }
+            { id: 'f1', title: 'PCR 진단키트 문서관리 양식', code: 'QF-DOC-001/002/003', file: 'doc-form.pdf' },
+            { id: 'f2', title: '위험관리 양식 (Plan/Report/FMEA)', code: 'QF-RA-701-01/02/03', file: 'risk-form.pdf' },
+            { id: 'f3', title: '시험 및 검사 양식 (입고/공정/완제품)', code: 'QC-F-01~03_통합', file: 'test-form.pdf' },
+            { id: 'f4', title: '식별 및 추적관리 양식', code: 'QC-F-01/02/03_추적', file: 'trace-form.pdf' },
+            { id: 'f5', title: 'CAPA 시정 및 예방조치 양식', code: 'QF-CAPA-001/003', file: 'capa-form.pdf' }
         ];
 
-        // Master Quiz Pool (25 Questions: 5 from each of the 5 SOPs)
+        // Master Quiz Pool (25 Questions)
         const quizBank = [
             // 문서관리 5문제
             { sop: '문서관리', type: 'choice', q: '문서관리 절차서에 따라 개정된 최신 문서를 배포할 때 구문서에 대해 취해야 하는 조치는?', options: ['모두 보관함에 보관한다', '즉시 회수하여 폐기하거나 구문서 표시를 한다', '외부에 공개한다', '아무 조치도 하지 않는다'], ans: 1 },
@@ -653,18 +654,14 @@
 
         // Tab Switching Logic
         function switchTab(tabId) {
-            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            // Remove active style from all buttons
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'bg-sbk-primary', 'text-white'));
             
-            // Show selected page
             const targetPage = document.getElementById(`page-${tabId}`);
             if (targetPage) {
                 targetPage.classList.remove('hidden');
             }
 
-            // Highlight active tab button
             const activeTabBtn = document.getElementById(`tab-${tabId}`);
             if (activeTabBtn) {
                 activeTabBtn.classList.add('active');
@@ -691,7 +688,7 @@
             `).join('');
         }
 
-        // Initialize Forms Cards
+        // Initialize Forms Cards (실제 다운로드 <a> 태그 적용)
         function renderForms() {
             const container = document.getElementById('forms-list-container');
             container.innerHTML = formsData.map(form => `
@@ -708,9 +705,10 @@
                         <button onclick="previewForm('${form.title}', '${form.code}')" class="w-full bg-gray-100 hover:bg-gray-200 text-sbk-darkText text-xs font-bold py-2 rounded-xl transition-all flex items-center justify-center gap-1.5">
                             <i class="fa-solid fa-magnifying-glass"></i> 양식 미리보기
                         </button>
-                        <button onclick="downloadForm('${form.file}')" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+                        <!-- 실제 파일 경로 직접 연결 및 download 속성 적용 -->
+                        <a href="${form.file}" download class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
                             <i class="fa-solid fa-download"></i> 양식 파일 다운로드
-                        </button>
+                        </a>
                     </div>
                 </div>
             `).join('');
@@ -718,7 +716,6 @@
 
         // Load & Shuffle Quiz (25 items)
         function loadRandomQuiz() {
-            // Shuffle array logic
             const shuffled = [...quizBank].sort(() => Math.random() - 0.5);
             currentActiveQuiz = shuffled;
 
@@ -816,7 +813,7 @@
                 </div>
                 <p class="text-xs text-gray-600">본 서식은 SBK 품질경영시스템의 핵심 양식으로 문서 작성자, 검토자, 승인자 결재란 및 데이터 추적 항목이 명확히 구획되어 있습니다.</p>
                 <div class="border rounded-xl p-4 bg-gray-50 text-center text-xs font-mono text-gray-500 my-4">
-                    [ 서식 표준 데이터 기록 영역 - 다운로드 시 PDF/엑셀 원본 제공 ]
+                    [ 서식 표준 데이터 기록 영역 - 다운로드 시 원본 파일이 제공됩니다 ]
                 </div>
             `;
             document.getElementById('document-modal').classList.remove('hidden');
@@ -824,18 +821,6 @@
 
         function closeModal() {
             document.getElementById('document-modal').classList.add('hidden');
-        }
-
-        // Download Form Handler
-        function downloadForm(fileName) {
-            const element = document.createElement('a');
-            const fileText = `[SBK 표준 품질 양식]\n파일명: ${fileName}\n본 파일은 (주)SBK PCR 진단키트 품질경영시스템 인증 서식 원본 데이터입니다.\n발행처: 주식회사 SBK 품질보증부`;
-            const file = new Blob([fileText], {type: 'text/plain'});
-            element.href = URL.createObjectURL(file);
-            element.download = fileName;
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
         }
 
         // Video Timeline Seek
